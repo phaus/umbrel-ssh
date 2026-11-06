@@ -2,7 +2,7 @@ manifestVersion: 1
 id: phaus-ssh
 name: SSH Key Manager
 tagline: Manage SSH keys for root and umbrel
-icon: https://raw.githubusercontent.com/phaus/umbrel-ssh/master/icon.svg
+icon: https://raw.githubusercontent.com/phaus/umbrel-ssh/main/icon.svg
 category: development
 version: "0.0.1-alpha"
 port: 16161
