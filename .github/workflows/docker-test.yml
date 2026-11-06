@@ -47,7 +47,7 @@ jobs:
           curl -sf http://localhost:16161/api/keys | jq -e '.keys | length == 1' > /dev/null
 
           echo "Testing delete..."
-          curl -sf -X DELETE "http://localhost:16161/api/keys/$ID" | jq -e '.deleted == $ID' > /dev/null
+          curl -sf -X DELETE "http://localhost:16161/api/keys/$ID" | jq -e --arg id "$ID" '.deleted == $id' > /dev/null
           curl -sf http://localhost:16161/api/keys | jq -e '.keys | length == 0' > /dev/null
 
           echo "All tests passed!"
