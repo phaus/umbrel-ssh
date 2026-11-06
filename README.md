@@ -34,6 +34,8 @@ of the `umbrel` user (`uid 1000`).
 
 ## Development
 
+![SSH Keys web UI](docs/dashboard.png)
+
 ```bash
 docker build -t umbrel-ssh .
 docker run --rm -d --name umbrel-ssh-test -p 16161:16161 umbrel-ssh
