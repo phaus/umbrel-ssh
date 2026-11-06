@@ -1,0 +1,18 @@
+FROM python:3.14-alpine AS test
+WORKDIR /app
+COPY docker/umbrel_ssh_service.py .
+COPY docker/keys.json /tmp/test-keys.json
+ENV KEYS_FILE=/tmp/test-keys.json ROOT_HOME=/tmp/mock-root UMBREL_HOME=/tmp/mock-umbrel
+# smoke: import, sync to mock homes, verify managed sections
+RUN python3 <<'EOF'
+import os, sys
+sys.path.insert(0, "/app")
+import umbrel_ssh_service as svc
+results = svc.sync_all()
+assert set(results) == {"root", "umbrel"}
+for path in results.values():
+    assert os.path.exists(path), path
+    content = open(path).read()
+    assert svc.MANAGED_BEGIN in content and svc.MANAGED_END in content
+print("mock sync OK:", results)
+EOF

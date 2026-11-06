@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+*.pub
+id_ed25519*
+mock-home/
