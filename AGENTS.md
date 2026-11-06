@@ -55,6 +55,7 @@ keys.json             # (runtime, mounted) key collection — DO NOT commit real
   sibling app `qemu-ga-container` (STATS_PORT=8080 → here SSH_PORT).
 - Commits: conventional commits (`feat:`, `fix:`, `docs:`, `ci:`).
 - Version in `umbrel-app.yml` and the released docker tag must match.
+  For prereleases use the full string (e.g. `0.0.1-alpha`).
 
 ## Never do this
 

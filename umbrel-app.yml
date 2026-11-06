@@ -4,7 +4,7 @@ name: SSH Key Manager
 tagline: Manage SSH keys for root and umbrel
 icon: https://raw.githubusercontent.com/phaus/umbrel-ssh/master/icon.svg
 category: development
-version: "1.0.0"
+version: "0.0.1-alpha"
 port: 16161
 description: >
   Manage SSH public keys for the root and umbrel users of your Umbrel host.
@@ -20,7 +20,8 @@ repo: https://github.com/phaus/umbrel-ssh
 support: https://github.com/phaus/umbrel-ssh/issues
 gallery: []
 releaseNotes: >
-  Initial release.
+  Initial alpha release: web UI to manage SSH keys for root and umbrel,
+  boot sync of authorized_keys, key collection as source of truth.
 dependencies: []
 path: ""
 defaultUsername: ""

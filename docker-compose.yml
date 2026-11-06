@@ -2,7 +2,7 @@ version: "3.7"
 
 services:
   ssh:
-    image: ghcr.io/phaus/umbrel-ssh:1.0.0
+    image: ghcr.io/phaus/umbrel-ssh:0.0.1-alpha
     privileged: true
     ports:
       - "16161:16161"
