@@ -1,0 +1,55 @@
+name: Docker Build and Test
+
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build test image (mock sync smoke test)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile.test
+          load: true
+          tags: umbrel-ssh-test:ci
+
+      - name: Run service smoke test
+        run: |
+          # entrypoint requires /data for keys.json; CI uses tmp dirs via env
+          docker run -d --name umbrel-ssh-ci \
+            -e KEYS_FILE=/tmp/keys.json \
+            -e ROOT_HOME=/tmp/mock-root \
+            -e UMBREL_HOME=/tmp/mock-umbrel \
+            -p 16161:16161 \
+            umbrel-ssh-test:ci
+          echo "Waiting for service to start..."
+          timeout 30s bash -c 'until curl -sf http://localhost:16161/api/health > /dev/null; do sleep 1; done' \
+            || (echo "Service failed to start" && docker logs umbrel-ssh-ci && exit 1)
+
+          echo "Testing key roundtrip..."
+          # CI placeholder key (generated for this repo's CI only, no private part committed)
+          KEY='ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILSCqmhuV9y8tK3BqrlbKmz1WHOWv8r2JwLuRDHUDvdd ci-placeholder'
+          BODY=$(jq -n --arg key "$KEY" '{key: $key, comment: "ci test", targets: ["root", "umbrel"]}')
+          ID=$(curl -sf -X POST http://localhost:16161/api/keys \
+            -H 'Content-Type: application/json' -d "$BODY" | jq -r '.id')
+          [ -n "$ID" ] && [ "$ID" != "null" ] || (echo "Adding key failed" && docker logs umbrel-ssh-ci && exit 1)
+
+          curl -sf http://localhost:16161/api/keys | jq -e '.keys | length == 1' > /dev/null
+
+          echo "Testing delete..."
+          curl -sf -X DELETE "http://localhost:16161/api/keys/$ID" | jq -e '.deleted == $ID' > /dev/null
+          curl -sf http://localhost:16161/api/keys | jq -e '.keys | length == 0' > /dev/null
+
+          echo "All tests passed!"
+          docker stop umbrel-ssh-ci > /dev/null
+          docker rm umbrel-ssh-ci > /dev/null

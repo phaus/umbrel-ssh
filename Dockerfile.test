@@ -1,7 +1,10 @@
 FROM python:3.14-alpine AS test
+RUN apk add --no-cache openssh-client-default
 WORKDIR /app
 COPY docker/umbrel_ssh_service.py .
+COPY docker/entrypoint.sh /entrypoint.sh
 COPY docker/keys.json /tmp/test-keys.json
+RUN chmod +x /entrypoint.sh
 ENV KEYS_FILE=/tmp/test-keys.json ROOT_HOME=/tmp/mock-root UMBREL_HOME=/tmp/mock-umbrel
 # smoke: import, sync to mock homes, verify managed sections
 RUN python3 <<'EOF'
@@ -16,3 +19,5 @@ for path in results.values():
     assert svc.MANAGED_BEGIN in content and svc.MANAGED_END in content
 print("mock sync OK:", results)
 EOF
+
+ENTRYPOINT [ "/entrypoint.sh" ]
